@@ -55,7 +55,7 @@ The application main features are:
 * [Python](https://www.python.org/)
 * [Jupyter](https://jupyter.org/)
 * [Tkinter](https://docs.python.org/fr/3/library/tkinter.html)
-* [VSCode.js](https://code.visualstudio.com/)
+* [VSCode](https://code.visualstudio.com/)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
