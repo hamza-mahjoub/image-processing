@@ -25,6 +25,7 @@ class main_app:
         self.orig_image = ImageModel()
         self.new_image = ImageModel()
         self.otsu_image = ImageModel()
+        self.binary_instances = []
 
     def init_interface(self):
 
@@ -161,21 +162,20 @@ class main_app:
         tk.Label(operations_frame, text="Histogram equalization").grid(row=0, column=0)
         self.histogram_equalization = tk.Button(operations_frame, text="Equalize", padx=10, pady=5, command=self.equalize_callback,state=tk.DISABLED)
         self.histogram_equalization.grid(row=0, column=1,padx=10)
-        tk.Label(operations_frame, text="Define A(x,y) and B(z,w) for contrast function (x <= z)").grid(row=1, column=0,columnspan=10,padx=5,pady=5,sticky='w')
 
         contrast_function_frame = tk.Frame(new_image_data_frame, height=100, width=100, pady=5)
         
-        tk.Label(contrast_function_frame, text="Point A (x,y):").grid(row=2, column=0,pady=5,padx=5,sticky='w')
+        tk.Label(contrast_function_frame, text="Point A (x,y):").grid(row=1, column=0,pady=5,padx=5,sticky='w')
         self.A_x = tk.Entry(contrast_function_frame, width=5, relief=tk.SUNKEN)
-        self.A_x .grid(row=2, column=1,sticky='w',padx=5)
+        self.A_x .grid(row=1, column=1,sticky='w',padx=5)
         self.A_y = tk.Entry(contrast_function_frame,width=5, relief=tk.SUNKEN)
-        self.A_y .grid(row=2, column=2,sticky='w',padx=5)
+        self.A_y .grid(row=1, column=2,sticky='w',padx=5)
 
-        tk.Label(contrast_function_frame, text="Point B (z,w):").grid(row=3, column=0,pady=5,padx=5,sticky='w')
+        tk.Label(contrast_function_frame, text="Point B (z,w):").grid(row=2, column=0,pady=5,padx=5,sticky='w')
         self.B_x = tk.Entry(contrast_function_frame, width=5, relief=tk.SUNKEN)
-        self.B_x.grid(row=3, column=1,sticky='w',padx=5)
+        self.B_x.grid(row=2, column=1,sticky='w',padx=5)
         self.B_y = tk.Entry(contrast_function_frame, width=5, relief=tk.SUNKEN)
-        self.B_y.grid(row=3, column=2,sticky='w',padx=5)
+        self.B_y.grid(row=2, column=2,sticky='w',padx=5)
 
         self.contrast_button = tk.Button(contrast_function_frame, text="Contrast Function", padx=10, pady=5, command=self.contrast_function_callback,state=tk.DISABLED)
         self.contrast_button.grid(row=2, column=3,rowspan=2,padx=10)
@@ -208,7 +208,7 @@ class main_app:
         self.high_filter.grid(row=3, column=0,padx=10)
         self.laplace_filter = tk.Button(buttons_frame, text="Laplace filter", padx=10, pady=5, command=self.laplace_filter,state=tk.DISABLED)
         self.laplace_filter.grid(row=3, column=1,padx=10)
-        
+
         buttons_frame.pack(anchor=tk.NW,padx=10)
         buttons_frame.pack(anchor=tk.NW,padx=10)
     
@@ -236,7 +236,8 @@ class main_app:
         self.ouverture.grid(row=3, column=2,padx=10,pady=(0,5))
         self.fermeture = tk.Button(binary_frame, text="Fermeture",width=10, padx=10, pady=5, command=self.closing,state=tk.DISABLED)
         self.fermeture.grid(row=4, column=0,padx=10)
-
+        self.reset_button = tk.Button(binary_frame, text="Reset",width=10, padx=10, pady=5, command=self.reset_instance,state=tk.DISABLED)
+        self.reset_button.grid(row=4, column=1,padx=10)
         
         binary_frame.pack(anchor=tk.NW,padx=10)
         binary_frame.pack(anchor=tk.NW,padx=10)
@@ -461,16 +462,22 @@ class main_app:
         self.dilatation.config(state=tk.NORMAL)
         self.ouverture.config(state=tk.NORMAL)
         self.fermeture.config(state=tk.NORMAL)
+        self.reset_button.config(state=tk.NORMAL)
+        self.binary_instances.append(self.otsu_image)
     
     def erosion_func(self):
         element_size = self.element_size.get()
         if(element_size == ""):
             self.write_console("Add structurant element size !!")
         else:
-            width,height,gray_level,final_image = mor.erosion(self.otsu_image.get_data(), int(element_size))
+            if(len(self.binary_instances) == 1):
+                width,height,gray_level,final_image = mor.erosion(self.otsu_image.get_data(), int(element_size))
+            else:
+                width,height,gray_level,final_image = mor.erosion(self.binary_instances[-1].get_data(), int(element_size))
             self.new_image.set_attributes(width, height, gray_level, final_image)
             self.write_console("Erosion applied !")
             self.update_new_image()
+            self.binary_instances.append(self.new_image)
             #self.new_snr_text.config(text=str(filt.SNR(self.orig_image.get_data(), self.new_image.get_data())))
     
     def dilatation_func(self):
@@ -478,11 +485,15 @@ class main_app:
         if(element_size == ""):
             self.write_console("Add structurant element size !!")
         else:
-            element_size = self.element_size.get()
-            width,height,gray_level,final_image = mor.dilatation(self.otsu_image.get_data(), int(element_size))
+            if(len(self.binary_instances) == 1):
+                width,height,gray_level,final_image = mor.dilatation(self.otsu_image.get_data(), int(element_size))
+            else:
+                width,height,gray_level,final_image = mor.dilatation(self.binary_instances[-1].get_data(), int(element_size))
+            #width,height,gray_level,final_image = mor.dilatation(self.otsu_image.get_data(), int(element_size))
             self.new_image.set_attributes(width, height, gray_level, final_image)
             self.write_console("dilatation applied !")
             self.update_new_image()
+            self.binary_instances.append(self.new_image)
             #self.new_snr_text.config(text=str(filt.SNR(self.orig_image.get_data(), self.new_image.get_data())))
 
     def opening(self):
@@ -490,23 +501,41 @@ class main_app:
         if(element_size == ""):
             self.write_console("Add structurant element size !!")
         else:
-            element_size = self.element_size.get()
-            width,height,gray_level,final_image = mor.opening(self.otsu_image.get_data(), int(element_size))
+            if(len(self.binary_instances) == 1):
+                width,height,gray_level,final_image = mor.opening(self.otsu_image.get_data(), int(element_size))
+            else:
+                width,height,gray_level,final_image = mor.opening(self.binary_instances[-1].get_data(), int(element_size))
+            #width,height,gray_level,final_image = mor.opening(self.otsu_image.get_data(), int(element_size))
             self.new_image.set_attributes(width, height, gray_level, final_image)
             self.write_console("Erosion applied !")
             self.update_new_image()
+            self.binary_instances.append(self.new_image)
     
     def closing(self):
         element_size = self.element_size.get()
         if(element_size == ""):
             self.write_console("Add structurant element size !!")
         else:
-            element_size = self.element_size.get()
-            width,height,gray_level,final_image = mor.closing(self.otsu_image.get_data(), int(element_size))
+            if(len(self.binary_instances) == 1):
+                width,height,gray_level,final_image = mor.closing(self.otsu_image.get_data(), int(element_size))
+            else:
+                width,height,gray_level,final_image = mor.closing(self.binary_instances[-1].get_data(), int(element_size))
+            #width,height,gray_level,final_image = mor.closing(self.otsu_image.get_data(), int(element_size))
             self.new_image.set_attributes(width, height, gray_level, final_image)
             self.write_console("Erosion applied !")
             self.update_new_image()
+            self.binary_instances.append(self.new_image)
 
+    def reset_instance(self):
+        if (len(self.binary_instances) == 1):
+            self.write_console("Already at orginal binarized function")
+        else:
+            last_image = self.binary_instances.pop()
+            width,height,gray_level,last_image_data = last_image.get_data()
+            self.new_image.set_attributes(width,height,gray_level,last_image_data)
+            self.write_console("precedent image!")
+            self.update_new_image()
+    
     def write_console(self, text):
         self.console.config(state=tk.NORMAL)
         self.console.insert(tk.END,f'{datetime.today().strftime("%Y-%m-%d %H:%M:%S")} : {text}\n' )

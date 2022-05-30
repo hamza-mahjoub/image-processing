@@ -10,7 +10,7 @@ def otsu(data):
     flat_image = image.flatten("C")
 
     pixel_number = width * height
-    mean_weigth = 1.0/pixel_number
+    mean_weigth = 2.0/pixel_number
 
     his, bins = np.histogram(flat_image, np.array(range(0, max_l+1)))
     final_thresh = -1
