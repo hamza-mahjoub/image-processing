@@ -463,21 +463,22 @@ class main_app:
         self.ouverture.config(state=tk.NORMAL)
         self.fermeture.config(state=tk.NORMAL)
         self.reset_button.config(state=tk.NORMAL)
-        self.binary_instances.append(self.otsu_image)
+        self.binary_instances = []
     
     def erosion_func(self):
         element_size = self.element_size.get()
         if(element_size == ""):
             self.write_console("Add structurant element size !!")
         else:
-            if(len(self.binary_instances) == 1):
+            if(len(self.binary_instances) == 0):
                 width,height,gray_level,final_image = mor.erosion(self.otsu_image.get_data(), int(element_size))
+                self.binary_instances.append(self.otsu_image)
             else:
                 width,height,gray_level,final_image = mor.erosion(self.binary_instances[-1].get_data(), int(element_size))
+                self.binary_instances.append(self.binary_instances[-1])
             self.new_image.set_attributes(width, height, gray_level, final_image)
             self.write_console("Erosion applied !")
             self.update_new_image()
-            self.binary_instances.append(self.new_image)
             #self.new_snr_text.config(text=str(filt.SNR(self.orig_image.get_data(), self.new_image.get_data())))
     
     def dilatation_func(self):
@@ -485,10 +486,12 @@ class main_app:
         if(element_size == ""):
             self.write_console("Add structurant element size !!")
         else:
-            if(len(self.binary_instances) == 1):
+            if(len(self.binary_instances) == 0):
                 width,height,gray_level,final_image = mor.dilatation(self.otsu_image.get_data(), int(element_size))
+                self.binary_instances.append(self.otsu_image)
             else:
                 width,height,gray_level,final_image = mor.dilatation(self.binary_instances[-1].get_data(), int(element_size))
+                self.binary_instances.append(self.binary_instances[-1])
             #width,height,gray_level,final_image = mor.dilatation(self.otsu_image.get_data(), int(element_size))
             self.new_image.set_attributes(width, height, gray_level, final_image)
             self.write_console("dilatation applied !")
@@ -501,10 +504,12 @@ class main_app:
         if(element_size == ""):
             self.write_console("Add structurant element size !!")
         else:
-            if(len(self.binary_instances) == 1):
+            if(len(self.binary_instances) == 0):
                 width,height,gray_level,final_image = mor.opening(self.otsu_image.get_data(), int(element_size))
+                self.binary_instances.append(self.otsu_image)
             else:
                 width,height,gray_level,final_image = mor.opening(self.binary_instances[-1].get_data(), int(element_size))
+                self.binary_instances.append(self.binary_instances[-1])
             #width,height,gray_level,final_image = mor.opening(self.otsu_image.get_data(), int(element_size))
             self.new_image.set_attributes(width, height, gray_level, final_image)
             self.write_console("Erosion applied !")
@@ -516,10 +521,12 @@ class main_app:
         if(element_size == ""):
             self.write_console("Add structurant element size !!")
         else:
-            if(len(self.binary_instances) == 1):
+            if(len(self.binary_instances) == 0):
                 width,height,gray_level,final_image = mor.closing(self.otsu_image.get_data(), int(element_size))
+                self.binary_instances.append(self.otsu_image)
             else:
                 width,height,gray_level,final_image = mor.closing(self.binary_instances[-1].get_data(), int(element_size))
+                self.binary_instances.append(self.binary_instances[-1])
             #width,height,gray_level,final_image = mor.closing(self.otsu_image.get_data(), int(element_size))
             self.new_image.set_attributes(width, height, gray_level, final_image)
             self.write_console("Erosion applied !")
@@ -527,14 +534,14 @@ class main_app:
             self.binary_instances.append(self.new_image)
 
     def reset_instance(self):
-        if (len(self.binary_instances) == 1):
+        if (len(self.binary_instances) == 0):
             self.write_console("Already at orginal binarized function")
         else:
             last_image = self.binary_instances.pop()
             width,height,gray_level,last_image_data = last_image.get_data()
             self.new_image.set_attributes(width,height,gray_level,last_image_data)
-            self.write_console("precedent image!")
             self.update_new_image()
+            self.write_console("precedent image!")
     
     def write_console(self, text):
         self.console.config(state=tk.NORMAL)
