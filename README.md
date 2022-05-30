@@ -26,6 +26,7 @@
       </ul>
     </li>
     <li><a href="#usage">Usage</a></li>
+    <li><a href="#contributing">Contributing</a></li>
     <li><a href="#contact">Contact</a></li>
     <li><a href="#acknowledgments">Acknowledgments</a></li>
   </ol>
@@ -82,9 +83,9 @@ Clone the repo
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-This project contain 2 main files which are `app.ipynb` and `main.py` under interfaces.
-**app.ipynb** contains all implemented features without an interface(you can visualize the results on the github).
-**main.py** is the entry point of the interface below.
+This project contain 2 main files which are `app.ipynb` and `main.py` under interfaces.  
+**app.ipynb** contains all implemented features without an interface(you can visualize the results on the github).  
+**main.py** is the entry point of the interface below.  
 ![image](assets/image1.jpg)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
